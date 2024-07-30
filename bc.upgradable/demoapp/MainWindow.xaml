@@ -5,8 +5,63 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:demoapp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        DataContext="{Binding Source={StaticResource Locator}, Path=Demo}"
+        Title="{Binding Title}" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Name="GlassyButtonStyle" TargetType="Button" x:Key="Glass1">
+            <Setter Property="Background" Value="#25040404"></Setter>
+            <Setter Property="Foreground" Value="Aquamarine"></Setter>
+            <Setter Property="BorderBrush" Value="Aquamarine"></Setter>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Grayscale"></Setter>
+            <!--<Setter Property="Effect" >
+                <Setter.Value>
+                    <BlurEffect KernelType="Gaussian" Radius="0" ></BlurEffect>
+                </Setter.Value>
+            </Setter>-->
+        </Style>
+    </Window.Resources>
+    <Window.Background>
+        <LinearGradientBrush>
+            <GradientStop Color="Crimson" Offset="0.01"></GradientStop>
+            <GradientStop Color="purple" Offset="0.49"></GradientStop>
+            <GradientStop Color="purple" Offset="0.82"></GradientStop>
+            <GradientStop Color="MediumPurple" Offset="0.99"></GradientStop>
+        </LinearGradientBrush>
+    </Window.Background>
+    <Grid Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="4*"></RowDefinition>
+            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="20"></RowDefinition>
+        </Grid.RowDefinitions>
 
+        <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Foreground="White" TextAlignment="Center" VerticalAlignment="Center">
+            <Run FontWeight="Bold" FontSize="16" >Auto-upgrading Applications</Run>
+            <LineBreak />
+            <Run>demo app</Run>
+        </TextBlock>
+
+        <Grid Grid.Row="2" HorizontalAlignment="Stretch" Background="Transparent" x:Name="CloudInfoPanel" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="6*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="6*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+        </Grid>
+
+        <Grid Grid.Row="3" HorizontalAlignment="Stretch" Background="Transparent" x:Name="LocalInfoPanel" >
+
+        </Grid>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Center" Background="Transparent" x:Name="ButtonsPanel" >
+            <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" Command="{Binding RefreshButtonClick}" >Refresh</Button>
+            <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" Command="{Binding DownloadButtonClick}">Download</Button>
+            <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" Command="{Binding InstallButtonClick}">Install</Button>
+            <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" Command="{Binding RefreshButtonClick}">Rollback</Button>
+            <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" Command="{Binding UninstallButtonClick}">Uninstall</Button>
+        </StackPanel>
     </Grid>
 </Window>

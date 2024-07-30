@@ -2,8 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:demoapp"
+             xmlns:ui="clr-namespace:demoapp.UI"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ui:ViewModelLocator x:Key="Locator"></ui:ViewModelLocator>
     </Application.Resources>
 </Application>
