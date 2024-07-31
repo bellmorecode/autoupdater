@@ -2,7 +2,8 @@
 {
     public interface IUpgrader: IDisposable
     {
-        List<MediaRegistryEntry> MediaRegistry { get; set; }
+        public List<MediaRegistryEntry> MediaRegistry { get; set; }
+        public List<MediaRegistryEntry> DownloadedRegistry { get; set; }
         public DateTime LastInstallDate { get; set; }
 
         public string InstalledVersion { get; set; }
@@ -13,8 +14,12 @@
 
         public bool CanRollback { get; set; }
 
+        public string MediaUrl { get; }
+        public string MediaLocation { get;  }
+        public string InstallLocation { get; }
+
         public Task Init();
-        public Task<bool> Upgrade();
+        public Task<bool> Install();
         public Task<bool> Rollback();
 
     }

@@ -2,9 +2,9 @@
 {
     public abstract class UpgraderBase : IUpgrader
     {
-        protected string MediaUrl { get; set; } = @"https://gfd.blob.core.windows.net/autoupdater/[appfolder]/registry.json";
-        protected string MediaLocation { get; set; } = @"c:\temp\";
-        protected string InstallLocation { get; set; } = @"c:\program files\";
+        public string MediaUrl { get; protected set; } = @"https://gfd.blob.core.windows.net/autoupdater/[appfolder]/registry.json";
+        public string MediaLocation { get; protected set; } = @"c:\temp\";
+        public string InstallLocation { get; protected set; } = @"c:\program files\";
 
         public string InstalledVersion { get; set; } = "0.0.0.0";
         public string LatestVersion { get; set; } = "0.0.0.0";
@@ -13,10 +13,11 @@
         public bool CanRollback { get; set; } = false;
 
         public List<MediaRegistryEntry> MediaRegistry { get; set; } = new List<MediaRegistryEntry>();
+        public List<MediaRegistryEntry> DownloadedRegistry { get; set; } = new List<MediaRegistryEntry>();
 
         public abstract Task<bool> Rollback();
 
-        public abstract Task<bool> Upgrade();
+        public abstract Task<bool> Install();
 
         public virtual async Task Init()
         {

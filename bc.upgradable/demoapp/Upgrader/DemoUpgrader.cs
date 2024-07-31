@@ -1,4 +1,6 @@
-﻿using bc.upgradable;
+﻿using Azure.Storage.Blobs;
+using bc.upgradable;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,71 +15,12 @@ using System.Threading.Tasks;
 
 namespace demoapp.Upgrader
 {
-    public sealed class DemoAppMetadata : IAppMetadata
-    {
-        public DemoAppMetadata()
-        {
-            DisplayName = "Demo App";
-            AppFolderName = "demoapp";
-            Agent = new DemoUpgrader( AppFolderName );
-        }
-
-
-
-        public IUpgrader Agent {get; private set;}
-
-        public string AppFolderName { get; set; }
-
-        public string DisplayName { get; set; }
-
-        public void Download()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Install()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Refresh()
-        {
-            Task.Factory.StartNew(_agent =>
-            {
-                if (_agent != null)
-                {
-                    IUpgrader upgrader = (IUpgrader)_agent;
-                    var task = upgrader.Init();
-                    task.Wait();
-
-                }
-            }, this.Agent);
-        }
-
-        public void Rollback()
-        {
-            if (Agent != null && Agent.CanRollback)
-            {
-                var rollbackTask = Agent.Rollback();
-                if (rollbackTask != null)
-                {
-                    rollbackTask.Wait();
-                    var rollbackSucceeded = rollbackTask.Result;
-                    // TODO: report somehow
-                }
-            }
-        }
-
-        public void Uninstall()
-        {
-            throw new NotImplementedException();
-        }
-    }
 
     public sealed class DemoUpgrader : UpgraderBase
     {
         public DemoUpgrader(string appFolderName)
         {
+            Trace.TraceInformation("DemoUpgrader::ctor");
             MediaUrl = $@"https://gfd.blob.core.windows.net/autoupdater/{appFolderName}/registry.json";
             MediaLocation = $@"c:\temp\{appFolderName}\";
             InstallLocation = $@"c:\program files\{appFolderName}\";
@@ -93,6 +36,7 @@ namespace demoapp.Upgrader
 
         public override async Task Init()
         {
+            Trace.TraceInformation("DemoUpgrader.Init");
             // check folders exists.
             if (!Directory.Exists(this.MediaLocation))
             {
@@ -102,30 +46,53 @@ namespace demoapp.Upgrader
             {
                 Directory.CreateDirectory(this.InstallLocation);
             }
+
+            MediaRegistry.Clear();
+            DownloadedRegistry.Clear();
+
             // check the registry for new versions.
             if (!string.IsNullOrWhiteSpace(MediaUrl))
             {
-                var cl = new HttpClient();
-                try
+                using (var cl = new HttpClient())
                 {
-                    var response = await cl.GetAsync(MediaUrl);
-                    if (response != null)
+                    try
                     {
-
-                        var entries = await response.Content.ReadFromJsonAsync<MediaRegistryEntry[]>();
-                        if (entries != null)
+                        var response = await cl.GetAsync(MediaUrl);
+                        if (response != null)
                         {
-                            MediaRegistry.AddRange(entries);
+                            var entries = await response.Content.ReadFromJsonAsync<MediaRegistryEntry[]>();
+                            if (entries != null)
+                            {
+                                if (entries.Length > 0)
+                                {
+                                    MediaRegistry.AddRange(entries);
+                                }
+                                else
+                                {
+                                    MediaRegistry.Add(new MediaRegistryEntry { Name = "None Found", Path = "/", Version = "999.999.999.999" });
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError($"{ex}");
+                    }
+                }
+
+                var local_entries = Directory.GetFiles(MediaLocation, "*registryentry.json", SearchOption.AllDirectories);
+                if (local_entries != null)
+                {
+                    foreach(var entry in local_entries)
+                    {
+                        var data_entry = JsonConvert.DeserializeObject<MediaRegistryEntry>(File.ReadAllText(entry));
+                        if (data_entry != null)
+                        {
+                            DownloadedRegistry.Add(data_entry);
                         }
                     }
                 }
-                catch(Exception ex)
-                {
-                    Trace.TraceError($"{ex}");
-                }
             }
-
-            await base.Init();
         }
 
         public override async Task<bool> Rollback()
@@ -138,8 +105,9 @@ namespace demoapp.Upgrader
             }
             return await Task.FromResult(completedSuccessfully);
         }
-        public override async Task<bool> Upgrade()
+        public override async Task<bool> Install()
         {
+            Trace.TraceInformation("Install!");
             return await Task.FromResult(true);
         }
     }

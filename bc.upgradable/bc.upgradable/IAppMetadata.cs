@@ -9,6 +9,7 @@
         public void Install();
         public void Rollback();
         public void Uninstall();
+        public void Upload();
     }
 
     public sealed class MediaRegistryEntry

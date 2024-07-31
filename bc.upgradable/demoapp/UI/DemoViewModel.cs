@@ -1,7 +1,12 @@
-﻿using demoapp.Instrumentation;
+﻿using bc.upgradable;
+using demoapp.Instrumentation;
 using demoapp.Upgrader;
 using System;
 using System.Windows;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 
 namespace demoapp.UI
 {
@@ -18,6 +23,7 @@ namespace demoapp.UI
             InstallButtonClick = new SimpleCommand(this.Install);
             RollbackButtonClick = new SimpleCommand(this.Rollback);
             UninstallButtonClick = new SimpleCommand(this.Uninstall);
+            UploadButtonClick = new SimpleCommand(this.Upload);
         }
         private string _Title = "Demo App";
         public string Title
@@ -49,17 +55,45 @@ namespace demoapp.UI
         public SimpleCommand InstallButtonClick { get; set; }
         public SimpleCommand RollbackButtonClick { get; set; }
         public SimpleCommand UninstallButtonClick { get; set; }
+        public SimpleCommand UploadButtonClick { get; set; }
+
+        public ObservableCollection<MediaRegistryEntry> CloudRegistry { get; set; } = new ObservableCollection<MediaRegistryEntry>();
+        public ObservableCollection<MediaRegistryEntry> LocalRegistry { get; set; } = new ObservableCollection<MediaRegistryEntry>();
 
         // implementations
         private void Refresh(object? state)
         {
             try
             {
-                AppMetadata?.Refresh();
+                Trace.TraceInformation("refresh-button-click");
+                if (AppMetadata != null)
+                {
+                    AppMetadata.Refresh();
+                    Trace.TraceInformation("registry loaded");
+                    App.Current.Dispatcher.BeginInvoke(new Action<object?>(iup =>
+                    {
+                        CloudRegistry.Clear();
+                        if (iup != null && iup is IUpgrader)
+                        {
+                            var agent = (IUpgrader)iup;
+                            foreach (var item in agent.MediaRegistry)
+                            {
+                                CloudRegistry.Add(item);
+                            }
+                            foreach (var item in agent.DownloadedRegistry)
+                            {
+                                LocalRegistry.Add(item);
+                            }
+                            Trace.TraceInformation("view-model loaded");
+                        }
+                    }), AppMetadata.Agent);
+                }
+                LocalRegistry.Clear();
+                //Directory.GetDirectories(AppMetadata.Agent)
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{ex}");
+                Trace.TraceError($"Refresh: {ex}");
             }
         }
 
@@ -68,6 +102,7 @@ namespace demoapp.UI
             try
             {
                 AppMetadata?.Download();
+                Refresh(state);
             }
             catch (Exception ex)
             {
@@ -104,6 +139,18 @@ namespace demoapp.UI
             try
             {
                 AppMetadata?.Uninstall();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex}");
+            }
+        }
+
+        private void Upload(object? state)
+        {
+            try
+            {
+                AppMetadata?.Upload();
             }
             catch (Exception ex)
             {
