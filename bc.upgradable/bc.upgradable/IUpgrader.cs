@@ -12,6 +12,8 @@
 
         public string DownloadedVersion { get; set; }
 
+        public bool IsInstalled { get; set; }
+
         public bool CanRollback { get; set; }
 
         public string MediaUrl { get; }
@@ -19,7 +21,7 @@
         public string InstallLocation { get; }
 
         public Task Init();
-        public Task<bool> Install();
+        public Task<bool> Install(Guid entryId);
         public Task<bool> Rollback();
 
     }

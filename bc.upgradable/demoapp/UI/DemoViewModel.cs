@@ -72,6 +72,7 @@ namespace demoapp.UI
                     Trace.TraceInformation("registry loaded");
                     App.Current.Dispatcher.BeginInvoke(new Action<object?>(iup =>
                     {
+                        LocalRegistry.Clear();
                         CloudRegistry.Clear();
                         if (iup != null && iup is IUpgrader)
                         {
@@ -88,8 +89,6 @@ namespace demoapp.UI
                         }
                     }), AppMetadata.Agent);
                 }
-                LocalRegistry.Clear();
-                //Directory.GetDirectories(AppMetadata.Agent)
             }
             catch (Exception ex)
             {

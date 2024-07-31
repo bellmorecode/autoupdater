@@ -75,9 +75,19 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <StackPanel Orientation="Horizontal" >
-                <Label Foreground="White">Installed: </Label>
-                <Label Foreground="White" Content="{Binding AppMetadata.Agent.InstalledVersion}"></Label>
+            <StackPanel Orientation="Horizontal" Margin="6,0" >
+                <Label Foreground="White" FontSize="14">Installed: </Label>
+                <Label Foreground="White" FontSize="14" Content="{Binding AppMetadata.Agent.InstalledVersion}"></Label>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="6,0" >
+                <Label Foreground="White" FontSize="14" Width="136">Install Location:</Label>
+                <TextBox FontSize="14" Text="{Binding AppMetadata.Agent.InstallLocation, Mode=OneWay}" Width="500" VerticalContentAlignment="Center" Padding="12,0"></TextBox>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="6,0" >
+                <Label Foreground="White" FontSize="14" Width="136">Download Location:</Label>
+                <TextBox FontSize="14" Text="{Binding AppMetadata.Agent.MediaLocation, Mode=OneWay}" Width="500" VerticalContentAlignment="Center" Padding="12,0"></TextBox>
             </StackPanel>
         </Grid>
 
@@ -85,7 +95,7 @@
             <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" Command="{Binding DownloadButtonClick}">Download</Button>
             <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" Command="{Binding InstallButtonClick}">Install</Button>
             <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" IsEnabled="{Binding AppMetadata.Agent.CanRollback}" Command="{Binding RollbackButtonClick}">Rollback</Button>
-            <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" Command="{Binding UninstallButtonClick}">Uninstall</Button>
+            <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" IsEnabled="{Binding AppMetadata.Agent.IsInstalled}" Command="{Binding UninstallButtonClick}">Uninstall</Button>
             <Button Style="{StaticResource Glass1}" Visibility="Collapsed" Width="120" Height="40" Margin="6,0" Command="{Binding UploadButtonClick}">Upload</Button>
             <Button Style="{StaticResource Glass1}" Width="120" Height="40" Margin="6,0" Command="{Binding RefreshButtonClick}" >
                Refresh
