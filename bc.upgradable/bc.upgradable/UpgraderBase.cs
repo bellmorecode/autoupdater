@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Net.Http.Json;
+using System.Security.Permissions;
+using System.Security.Principal;
 
 namespace bc.upgradable
 {
@@ -22,11 +24,27 @@ namespace bc.upgradable
 
         public virtual async Task<bool> Install(Guid entryId)
         {
+            // elevate to install
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            var isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+            if (!isAdmin)
+            {
+                throw new InvalidOperationException("You need to run as Admin");
+            }
+
             var installed = false;
             var entry = DownloadedRegistry.FirstOrDefault(q => q.Id == entryId);
             if (entry != null)
             {
-                var files_to_copy = Directory.GetFiles($@"{MediaLocation}\{entry.Name}\{entry.Version}", "*.*");
+                var files_to_copy = Directory.GetFiles($@"{MediaLocation}\{entry.Version}", "*.*", SearchOption.AllDirectories);
+                foreach(var file in files_to_copy)
+                {
+                    var dest_path = $@"{InstallLocation}\{Path.GetFileName(file)}";
+                    File.Copy(file, dest_path, true);
+                }
+                InstalledVersion = entry.Version;
+                IsInstalled = true;
             }
             return await Task.FromResult(installed);
         }
@@ -103,5 +121,6 @@ namespace bc.upgradable
         }
 
         public virtual void Dispose() { }
+
     }
 }

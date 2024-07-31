@@ -23,6 +23,5 @@
         public Task Init();
         public Task<bool> Install(Guid entryId);
         public Task<bool> Rollback();
-
     }
 }

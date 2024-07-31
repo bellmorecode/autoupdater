@@ -6,7 +6,7 @@
 
         public void Refresh();
         public void Download();
-        public void Install();
+        public bool Install(Guid entryId);
         public void Rollback();
         public void Uninstall();
         public void Upload();

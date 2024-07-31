@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace demoapp.UI
 {
@@ -37,6 +38,17 @@ namespace demoapp.UI
             }
         }
 
+        private MediaRegistryEntry? _SelectedEntry = null;
+        public MediaRegistryEntry? SelectedEntry
+        {
+            get { return _SelectedEntry; }
+            set
+            {
+                if (_SelectedEntry == value) return;
+                _SelectedEntry = value;
+                RaisePropertyChanged("SelectedEntry");
+            }
+        }
 
         private DemoAppMetadata _AppMetadata = new DemoAppMetadata();
         public DemoAppMetadata AppMetadata
@@ -113,10 +125,29 @@ namespace demoapp.UI
         {
             try
             {
-                AppMetadata?.Install();
+                var selectedEntry = SelectedEntry;
+                if (selectedEntry != null)
+                {
+                    AppMetadata?.Install(selectedEntry.Id);
+                }
+                else
+                {
+                    MessageBox.Show("Select an app to install.");
+                }
+
             }
-            catch (Exception ex)
+            catch (AggregateException ex)
             {
+                if (ex.InnerExceptions.Any())
+                {
+                    var io = ex.InnerExceptions.First() as InvalidOperationException;
+                    if (io != null)
+                    {
+                        MessageBox.Show(io.Message);
+                        return;
+                    }
+                }
+
                 MessageBox.Show($"{ex}");
             }
         }

@@ -77,9 +77,13 @@ namespace demoapp.Upgrader
             }
         }
 
-        public void Install()
+        public bool Install(Guid entryId)
         {
-            Trace.TraceWarning("Install not Implemented yet.");
+            var result = false;
+            var installerTask = this.Agent.Install(entryId);
+            installerTask.Wait();
+            result = installerTask.Result;
+            return result;
         }
 
         public void Refresh()
