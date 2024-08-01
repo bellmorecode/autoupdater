@@ -62,6 +62,19 @@ namespace demoapp.UI
             }
         }
 
+
+        private string _VersionString = "X.X.X.X";
+        public string VersionString
+        {
+            get { return _VersionString; }
+            set
+            {
+                if (_VersionString == value) return;
+                _VersionString = value;
+                RaisePropertyChanged("VersionString");
+            }
+        }
+
         public SimpleCommand RefreshButtonClick { get; set; }
         public SimpleCommand DownloadButtonClick { get; set; }
         public SimpleCommand InstallButtonClick { get; set; }
