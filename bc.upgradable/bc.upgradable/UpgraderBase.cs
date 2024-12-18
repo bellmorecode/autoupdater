@@ -22,6 +22,16 @@ namespace bc.upgradable
         public List<MediaRegistryEntry> MediaRegistry { get; set; } = new List<MediaRegistryEntry>();
         public List<MediaRegistryEntry> DownloadedRegistry { get; set; } = new List<MediaRegistryEntry>();
 
+        public void ExecuteAsAdmin(string filename)
+        {
+            Process proc = new Process();
+            proc.StartInfo.FileName = filename;
+            proc.StartInfo.UseShellExecute = true;
+            proc.StartInfo.WorkingDirectory = Path.GetDirectoryName(filename);
+            proc.StartInfo.Verb = "runas";
+            proc.Start();
+        }
+
         public virtual async Task<bool> Install(Guid entryId)
         {
             // elevate to install
@@ -30,7 +40,14 @@ namespace bc.upgradable
             var isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
             if (!isAdmin)
             {
-                throw new InvalidOperationException("You need to run as Admin");
+                var dir = AppDomain.CurrentDomain.BaseDirectory;
+                var name = AppDomain.CurrentDomain.FriendlyName;
+
+                var filename = $"{dir}{name}.exe";
+                ExecuteAsAdmin(filename);
+
+                //throw new InvalidOperationException("You need to run as Admin");
+                return false;
             }
 
             var installed = false;
@@ -43,8 +60,7 @@ namespace bc.upgradable
                     var dest_path = $@"{InstallLocation}\{Path.GetFileName(file)}";
                     File.Copy(file, dest_path, true);
                 }
-                InstalledVersion = entry.Version;
-                IsInstalled = true;
+
             }
             return await Task.FromResult(installed);
         }

@@ -67,13 +67,13 @@ namespace demoapp.Upgrader
                         File.WriteAllBytes(contentDownloadPath, readTask.Result);
                     }
                 }
-                App.Current.Dispatcher.BeginInvoke(new Action<object?>(arg =>
-                {
-                    if (arg != null && arg is MediaRegistryEntry)
-                    {
+                //App.Current.Dispatcher.BeginInvoke(new Action<object?>(arg =>
+                //{
+                //    if (arg != null && arg is MediaRegistryEntry)
+                //    {
 
-                    }
-                }), item);
+                //    }
+                //}), item);
             }
         }
 
