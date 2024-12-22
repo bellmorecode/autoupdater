@@ -3,10 +3,8 @@ using demoapp.Instrumentation;
 using demoapp.Upgrader;
 using System;
 using System.Windows;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 
 namespace demoapp.UI
@@ -16,8 +14,8 @@ namespace demoapp.UI
         /// <summary>
         /// This is the Demo View Model Constructor
         /// </summary>
-        public DemoViewModel () {
-
+        public DemoViewModel ()
+        {
             // initialize Commands
             RefreshButtonClick = new SimpleCommand(this.Refresh);
             DownloadButtonClick = new SimpleCommand(this.Download);

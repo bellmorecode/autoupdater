@@ -11,7 +11,6 @@ namespace bc.upgradable
         public string MediaUrl { get; protected set; } = @"https://gfd.blob.core.windows.net/autoupdater/[appfolder]/registry.json";
         public string MediaLocation { get; protected set; } = @"c:\temp\";
         public string InstallLocation { get; protected set; } = @"c:\program files\";
-
         public string InstalledVersion { get; set; } = "0.0.0.0";
         public string LatestVersion { get; set; } = "0.0.0.0";
         public string DownloadedVersion { get; set; } = "0.0.0.0";
@@ -32,13 +31,30 @@ namespace bc.upgradable
             proc.Start();
         }
 
+        private bool? _isAdmin = null;
+
+        public bool IsAdmininstrator
+        {
+            get
+            {
+                if (_isAdmin == null)
+                {
+                    // elevate to install
+                    WindowsIdentity identity = WindowsIdentity.GetCurrent();
+                    WindowsPrincipal principal = new WindowsPrincipal(identity);
+                    _isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+                }
+                return _isAdmin.GetValueOrDefault();
+            }
+            set { ; }
+        }
+
+
         public virtual async Task<bool> Install(Guid entryId)
         {
-            // elevate to install
-            WindowsIdentity identity = WindowsIdentity.GetCurrent();
-            WindowsPrincipal principal = new WindowsPrincipal(identity);
-            var isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
-            if (!isAdmin)
+
+
+            if (!IsAdmininstrator)
             {
                 var dir = AppDomain.CurrentDomain.BaseDirectory;
                 var name = AppDomain.CurrentDomain.FriendlyName;
@@ -46,8 +62,7 @@ namespace bc.upgradable
                 var filename = $"{dir}{name}.exe";
                 ExecuteAsAdmin(filename);
 
-                //throw new InvalidOperationException("You need to run as Admin");
-                return false;
+                return true;
             }
 
             var installed = false;

@@ -3,7 +3,6 @@
     public interface IAppMetadata
     {
         public IUpgrader Agent { get; }
-
         public void Refresh();
         public void Download();
         public bool Install(Guid entryId);
