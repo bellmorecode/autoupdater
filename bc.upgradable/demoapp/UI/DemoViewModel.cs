@@ -60,7 +60,6 @@ namespace demoapp.UI
             }
         }
 
-
         private string _VersionString = "X.X.X.X";
         public string VersionString
         {
@@ -83,7 +82,6 @@ namespace demoapp.UI
         public ObservableCollection<MediaRegistryEntry> CloudRegistry { get; set; } = new ObservableCollection<MediaRegistryEntry>();
         public ObservableCollection<MediaRegistryEntry> LocalRegistry { get; set; } = new ObservableCollection<MediaRegistryEntry>();
 
-        // implementations
         private void Refresh(object? state)
         {
             try
